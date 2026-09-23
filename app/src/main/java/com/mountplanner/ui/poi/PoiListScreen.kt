@@ -106,7 +106,7 @@ fun PoiCard(poi: Poi, onClick: () -> Unit, onDelete: () -> Unit) {
                 Column {
                     Text(text = poi.name, style = MaterialTheme.typography.titleMedium)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(text = poi.category)
+                        Text(text = "${poi.category.emoji} ${poi.category.label}")
                         if (poi.reliability == "verified") {
                             Text(text = "✅")
                         } else {

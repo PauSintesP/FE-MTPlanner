@@ -1,8 +1,8 @@
 package com.mountplanner.core.export
 
 import android.util.Xml
-import com.mountplanner.data.local.entity.LocationPoint
-import com.mountplanner.data.local.entity.Poi
+import com.mountplanner.data.model.LocationPoint
+import com.mountplanner.data.model.Poi
 import org.xmlpull.v1.XmlPullParser
 import java.io.InputStream
 import java.text.SimpleDateFormat
@@ -39,21 +39,23 @@ class GpxParser {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US).apply {
             timeZone = TimeZone.getTimeZone("UTC")
         }
-
+        
         while (eventType != XmlPullParser.END_DOCUMENT) {
+            val tagName = parser.name
             when (eventType) {
                 XmlPullParser.START_TAG -> {
-                    when (parser.name) {
+                    when (tagName) {
                         "trkpt" -> {
                             inTrkpt = true
-                            currentLat = parser.getAttributeValue(null, "lat").toDoubleOrNull() ?: 0.0
-                            currentLon = parser.getAttributeValue(null, "lon").toDoubleOrNull() ?: 0.0
+                            currentLat = parser.getAttributeValue(null, "lat")?.toDoubleOrNull() ?: 0.0
+                            currentLon = parser.getAttributeValue(null, "lon")?.toDoubleOrNull() ?: 0.0
                             currentEle = null
+                            currentTime = System.currentTimeMillis()
                         }
                         "wpt" -> {
                             inWpt = true
-                            currentLat = parser.getAttributeValue(null, "lat").toDoubleOrNull() ?: 0.0
-                            currentLon = parser.getAttributeValue(null, "lon").toDoubleOrNull() ?: 0.0
+                            currentLat = parser.getAttributeValue(null, "lat")?.toDoubleOrNull() ?: 0.0
+                            currentLon = parser.getAttributeValue(null, "lon")?.toDoubleOrNull() ?: 0.0
                             currentEle = null
                             currentPoiName = ""
                             currentPoiDesc = ""
@@ -61,16 +63,18 @@ class GpxParser {
                     }
                 }
                 XmlPullParser.TEXT -> {
-                    textValue = parser.text
+                    textValue = parser.text?.trim() ?: ""
                 }
                 XmlPullParser.END_TAG -> {
-                    when (parser.name) {
-                        "ele" -> currentEle = textValue.toDoubleOrNull()
+                    when (tagName) {
+                        "ele" -> {
+                            currentEle = textValue.toDoubleOrNull()
+                        }
                         "time" -> {
                             try {
                                 currentTime = dateFormat.parse(textValue)?.time ?: System.currentTimeMillis()
                             } catch (e: Exception) {
-                                // ignore
+                                currentTime = System.currentTimeMillis()
                             }
                         }
                         "name" -> {
@@ -83,10 +87,13 @@ class GpxParser {
                             if (inTrkpt) {
                                 trackPoints.add(
                                     LocationPoint(
-                                        latitude = currentLat,
-                                        longitude = currentLon,
-                                        elevation = currentEle,
-                                        timestamp = currentTime
+                                        lat = currentLat,
+                                        lng = currentLon,
+                                        altitudeM = currentEle,
+                                        accuracyM = null,
+                                        speedMps = null,
+                                        bearingDeg = null,
+                                        capturedAt = currentTime
                                     )
                                 )
                                 inTrkpt = false
@@ -98,9 +105,9 @@ class GpxParser {
                                     Poi(
                                         name = currentPoiName.ifEmpty { "Waypoint" },
                                         description = currentPoiDesc,
-                                        latitude = currentLat,
-                                        longitude = currentLon,
-                                        elevation = currentEle
+                                        lat = currentLat,
+                                        lng = currentLon,
+                                        altitudeM = currentEle
                                     )
                                 )
                                 inWpt = false

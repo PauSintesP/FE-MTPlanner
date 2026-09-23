@@ -49,11 +49,11 @@ fun PoiDetailScreen(
                 Text(text = "📍", style = MaterialTheme.typography.displayMedium)
                 Column {
                     Text(text = poi.name, style = MaterialTheme.typography.headlineSmall)
-                    Text(text = poi.category, style = MaterialTheme.typography.bodyLarge)
+                    Text(text = "${poi.category.emoji} ${poi.category.label}", style = MaterialTheme.typography.bodyLarge)
                 }
             }
             
-            Divider()
+            HorizontalDivider()
             
             Text(text = "Lat: ${poi.lat}, Lng: ${poi.lng}", style = MaterialTheme.typography.bodyMedium)
             
@@ -64,7 +64,7 @@ fun PoiDetailScreen(
             }
             
             Text(text = "Notas:", style = MaterialTheme.typography.titleMedium)
-            Text(text = poi.notes.ifEmpty { "Sin notas" }, style = MaterialTheme.typography.bodyMedium)
+            Text(text = poi.notes?.ifEmpty { "Sin notas" } ?: "Sin notas", style = MaterialTheme.typography.bodyMedium)
             
             Spacer(modifier = Modifier.weight(1f))
             

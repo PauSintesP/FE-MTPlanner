@@ -1,7 +1,7 @@
 package com.mountplanner.core
 
-import com.mountplanner.data.local.entity.LocationPoint
-import com.mountplanner.data.local.entity.Poi
+import com.mountplanner.data.model.LocationPoint
+import com.mountplanner.data.model.Poi
 import kotlin.math.*
 
 object HaversineCalculator {
@@ -23,7 +23,7 @@ object HaversineCalculator {
         for (i in 0 until points.size - 1) {
             val p1 = points[i]
             val p2 = points[i + 1]
-            total += distanceKm(p1.latitude, p1.longitude, p2.latitude, p2.longitude)
+            total += distanceKm(p1.lat, p1.lng, p2.lat, p2.lng)
         }
         return total
     }
@@ -31,8 +31,8 @@ object HaversineCalculator {
     fun elevationGainM(points: List<LocationPoint>): Double {
         var gain = 0.0
         for (i in 0 until points.size - 1) {
-            val e1 = points[i].elevation ?: continue
-            val e2 = points[i + 1].elevation ?: continue
+            val e1 = points[i].altitudeM ?: continue
+            val e2 = points[i + 1].altitudeM ?: continue
             if (e2 > e1) {
                 gain += (e2 - e1)
             }
@@ -43,8 +43,8 @@ object HaversineCalculator {
     fun elevationLossM(points: List<LocationPoint>): Double {
         var loss = 0.0
         for (i in 0 until points.size - 1) {
-            val e1 = points[i].elevation ?: continue
-            val e2 = points[i + 1].elevation ?: continue
+            val e1 = points[i].altitudeM ?: continue
+            val e2 = points[i + 1].altitudeM ?: continue
             if (e1 > e2) {
                 loss += (e1 - e2)
             }
@@ -53,7 +53,7 @@ object HaversineCalculator {
     }
 
     fun distanceToPoi(currentLat: Double, currentLng: Double, poi: Poi): Double {
-        return distanceKm(currentLat, currentLng, poi.latitude, poi.longitude)
+        return distanceKm(currentLat, currentLng, poi.lat, poi.lng)
     }
 
     fun sortByDistance(currentLat: Double, currentLng: Double, pois: List<Poi>): List<Poi> {

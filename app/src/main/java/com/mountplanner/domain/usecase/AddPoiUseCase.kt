@@ -4,6 +4,7 @@ import com.google.android.gms.location.Priority
 import com.mountplanner.core.location.LocationManager
 import com.mountplanner.core.prefs.AppPreferences
 import com.mountplanner.data.model.Poi
+import com.mountplanner.data.model.PoiCategory
 import com.mountplanner.data.repository.PoiRepository
 import kotlinx.coroutines.flow.first
 import java.util.UUID
@@ -41,13 +42,18 @@ class AddPoiUseCase @Inject constructor(
         }
         
         val activeExpeditionId = appPreferences.activeExpeditionId.first()
+        val parsedCategory = try {
+            PoiCategory.valueOf(category.uppercase())
+        } catch (e: Exception) {
+            PoiCategory.OTHER
+        }
         
         val poi = Poi(
             id = UUID.randomUUID().toString(),
             expeditionId = activeExpeditionId,
             name = name,
             description = description,
-            category = category,
+            category = parsedCategory,
             lat = finalLat,
             lng = finalLng,
             createdAt = System.currentTimeMillis(),

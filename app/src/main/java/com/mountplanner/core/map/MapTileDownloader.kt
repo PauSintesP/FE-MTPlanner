@@ -3,7 +3,6 @@ package com.mountplanner.core.map
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import org.osmdroid.tileprovider.cachemanager.CacheManager
-import org.osmdroid.tileprovider.modules.IFilesystemCache
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.BoundingBox
 import org.osmdroid.views.MapView
@@ -24,7 +23,6 @@ class MapTileDownloader @Inject constructor(
         onProgress: suspend (Int) -> Unit
     ) {
         val boundingBox = BoundingBox(maxLat, maxLng, minLat, minLng)
-        // Usar MapView auxiliar para instanciar CacheManager de osmdroid
         val mapView = MapView(context).apply {
             setTileSource(TileSourceFactory.MAPNIK)
         }
@@ -41,7 +39,8 @@ class MapTileDownloader @Inject constructor(
                     override fun onTaskComplete() {}
                     override fun onTaskFailed(errors: Int) {}
                     override fun updateProgress(progress: Int, currentZoomLevel: Int, zoomMin: Int, zoomMax: Int) {}
-                    override fun downloadFailed() {}
+                    override fun downloadStarted() {}
+                    override fun setPossibleTilesInArea(total: Int) {}
                 }
             )
         }
