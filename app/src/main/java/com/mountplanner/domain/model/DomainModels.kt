@@ -14,7 +14,3 @@ typealias CampRequest = com.mountplanner.data.remote.CampRequest
 typealias ResumeRequest = com.mountplanner.data.remote.ResumeRequest
 typealias StatsResponse = com.mountplanner.data.remote.StatsResponse
 typealias PingsResponse = com.mountplanner.data.remote.PingsResponse
-
-val Note.moodEmoji: String get() = mood ?: "📝"
-val Note.weatherEmoji: String get() = weather ?: "☀️"
-val Note.timestamp: Long get() = createdAt

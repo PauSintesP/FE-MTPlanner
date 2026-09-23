@@ -27,10 +27,6 @@ data class Note(
     val timestamp: Long get() = createdAt
 }
 
-val Note.moodEmoji: String get() = mood ?: "📝"
-val Note.weatherEmoji: String get() = weather ?: "☀️"
-val Note.timestamp: Long get() = createdAt
-
 fun Note.toEntity(): NoteEntity = NoteEntity(
     id = id,
     expeditionId = expeditionId,
