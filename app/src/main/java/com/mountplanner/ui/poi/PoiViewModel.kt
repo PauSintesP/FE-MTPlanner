@@ -3,13 +3,13 @@ package com.mountplanner.ui.poi
 import android.location.Location
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mountplanner.data.preferences.AppPreferences
-import com.mountplanner.domain.model.Poi
-import com.mountplanner.domain.model.PoiCategory
-import com.mountplanner.domain.repository.PoiRepository
+import com.mountplanner.core.location.LocationManager
+import com.mountplanner.core.prefs.AppPreferences
+import com.mountplanner.data.model.Poi
+import com.mountplanner.data.model.PoiCategory
+import com.mountplanner.data.repository.PoiRepository
 import com.mountplanner.domain.usecase.AddPoiUseCase
 import com.mountplanner.domain.usecase.GetNearbyPoisUseCase
-import com.mountplanner.util.LocationManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -38,7 +38,7 @@ class PoiViewModel @Inject constructor(
         _currentLocation, poiRepository.getByCategory("WATER_SOURCE")
     ) { loc, pois ->
         if (loc == null) pois
-        else getNearbyPoisUseCase(loc.latitude, loc.longitude, pois, maxDistance = 5.0)
+        else getNearbyPoisUseCase(loc.latitude, loc.longitude, limit = 5, category = "WATER_SOURCE")
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
     
     data class AddPoiFormState(
@@ -50,21 +50,7 @@ class PoiViewModel @Inject constructor(
         val lat: Double? = null,
         val lng: Double? = null,
         val useCurrentLocation: Boolean = true
-    ) {
-        fun toPoi(): Poi {
-            return Poi(
-                id = 0,
-                name = name,
-                category = category.name,
-                description = description,
-                notes = notes,
-                reliability = reliability,
-                lat = lat ?: 0.0,
-                lng = lng ?: 0.0,
-                timestamp = System.currentTimeMillis()
-            )
-        }
-    }
+    )
     
     private val _addPoiForm = MutableStateFlow(AddPoiFormState())
     val addPoiForm: StateFlow<AddPoiFormState> = _addPoiForm
@@ -77,7 +63,13 @@ class PoiViewModel @Inject constructor(
     
     fun savePoi(form: AddPoiFormState) {
         viewModelScope.launch {
-            addPoiUseCase(form.toPoi())
+            addPoiUseCase(
+                name = form.name,
+                description = form.description,
+                category = form.category.name,
+                lat = form.lat,
+                lng = form.lng
+            )
         }
     }
     

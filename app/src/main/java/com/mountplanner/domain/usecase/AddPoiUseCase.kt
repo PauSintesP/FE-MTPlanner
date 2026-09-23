@@ -1,9 +1,10 @@
 package com.mountplanner.domain.usecase
 
-import com.mountplanner.data.local.preferences.AppPreferences
-import com.mountplanner.domain.model.Poi
-import com.mountplanner.domain.repository.PoiRepository
-import com.mountplanner.util.LocationManager
+import com.google.android.gms.location.Priority
+import com.mountplanner.core.location.LocationManager
+import com.mountplanner.core.prefs.AppPreferences
+import com.mountplanner.data.model.Poi
+import com.mountplanner.data.repository.PoiRepository
 import kotlinx.coroutines.flow.first
 import java.util.UUID
 import javax.inject.Inject
@@ -26,7 +27,10 @@ class AddPoiUseCase @Inject constructor(
         var finalLng = lng
         
         if (finalLat == null || finalLng == null) {
-            val location = locationManager.getCurrentLocation(104, 5000L)
+            val location = locationManager.getCurrentLocation(
+                priority = Priority.PRIORITY_BALANCED_POWER_ACCURACY,
+                timeoutMs = 5000L
+            )
             if (location != null) {
                 finalLat = location.latitude
                 finalLng = location.longitude

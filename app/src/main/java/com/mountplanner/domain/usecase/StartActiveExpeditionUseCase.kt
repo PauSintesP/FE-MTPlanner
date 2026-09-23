@@ -1,10 +1,10 @@
 package com.mountplanner.domain.usecase
 
 import android.content.Context
-import com.mountplanner.data.local.preferences.AppPreferences
-import com.mountplanner.domain.repository.ExpeditionRepository
+import com.mountplanner.core.prefs.AppPreferences
+import com.mountplanner.data.remote.CreateTripRequest
 import com.mountplanner.data.remote.MountReporterApiService
-import com.mountplanner.domain.model.CreateTripRequest
+import com.mountplanner.data.repository.ExpeditionRepository
 import com.mountplanner.worker.LocationWorker
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
@@ -19,7 +19,7 @@ class StartActiveExpeditionUseCase @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     suspend operator fun invoke(expeditionId: String) {
-        val expedition = expeditionRepository.getById(expeditionId) ?: return
+        val expedition = expeditionRepository.getById(expeditionId).first() ?: return
         
         val updated = expedition.copy(
             status = "active",
@@ -33,25 +33,32 @@ class StartActiveExpeditionUseCase @Inject constructor(
         val mountReporterEnabled = appPreferences.mountReporterEnabled.first()
         if (mountReporterEnabled) {
             try {
+                val userName = appPreferences.userName.first().ifEmpty { "Senderista" }
                 val response = apiService.createTrip(
                     CreateTripRequest(
-                        userName = appPreferences.userName.first() ?: "Unknown",
+                        userName = userName,
                         routeName = updated.name
                     )
                 )
                 if (response.isSuccessful) {
                     tripId = response.body()?.tripId
                     shareToken = response.body()?.shareToken
-                    appPreferences.saveMountReporterTripId(tripId)
-                    appPreferences.saveShareToken(shareToken)
+                    appPreferences.setMountReporterTripId(tripId)
+                    appPreferences.setMountReporterShareToken(shareToken)
                 }
             } catch (e: Exception) {
-                // Ignore for now
+                // Continuar aunque no haya conexión inmediata
             }
         }
         
-        expeditionRepository.save(updated.copy(shareToken = shareToken))
-        appPreferences.saveActiveExpeditionId(expeditionId)
+        val finalExpedition = if (shareToken != null) {
+            updated.copy(mountReporterShareToken = shareToken, mountReporterTripId = tripId)
+        } else {
+            updated
+        }
+        expeditionRepository.save(finalExpedition)
+        appPreferences.setActiveExpeditionId(expeditionId)
+        appPreferences.setTripStatus("active")
         
         LocationWorker.enqueueLocationWorker(context, intervalMinutes = 15)
     }

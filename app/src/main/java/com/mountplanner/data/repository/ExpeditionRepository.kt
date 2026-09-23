@@ -21,6 +21,9 @@ class ExpeditionRepository @Inject constructor(
     
     fun getById(id: String): Flow<Expedition?> =
         expeditionDao.getById(id).map { it?.toDomain() }
+
+    fun getUpcomingExpeditions(): Flow<List<Expedition>> =
+        expeditionDao.getByStatus("planning").map { list -> list.map { it.toDomain() } }
     
     suspend fun save(expedition: Expedition) = expeditionDao.insert(expedition.toEntity())
     suspend fun update(expedition: Expedition) = expeditionDao.update(expedition.toEntity())

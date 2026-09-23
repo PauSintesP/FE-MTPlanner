@@ -1,7 +1,7 @@
 package com.mountplanner.domain.usecase
 
-import com.mountplanner.domain.model.Expedition
-import com.mountplanner.domain.repository.ExpeditionRepository
+import com.mountplanner.data.model.Expedition
+import com.mountplanner.data.repository.ExpeditionRepository
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton

@@ -2,8 +2,8 @@ package com.mountplanner.ui.weather
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mountplanner.domain.model.WeatherData
-import com.mountplanner.domain.repository.WeatherRepository
+import com.mountplanner.data.model.WeatherData
+import com.mountplanner.data.repository.WeatherRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,7 +36,7 @@ class WeatherViewModel @Inject constructor(
                 )
             } catch (e: Exception) {
                 val cached = weatherRepository.getCachedForecast(lat, lng)
-                _uiState.value = WeatherUiState.Error(e.message ?: "Error", cached)
+                _uiState.value = WeatherUiState.Error(e.message ?: "Error al cargar el tiempo", cached)
             }
         }
     }

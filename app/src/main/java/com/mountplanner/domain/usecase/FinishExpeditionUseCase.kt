@@ -1,13 +1,13 @@
 package com.mountplanner.domain.usecase
 
 import android.content.Context
-import com.mountplanner.data.local.preferences.AppPreferences
-import com.mountplanner.domain.repository.ExpeditionRepository
+import com.mountplanner.core.HaversineCalculator
+import com.mountplanner.core.prefs.AppPreferences
 import com.mountplanner.data.local.dao.LocationLogDao
 import com.mountplanner.data.remote.MountReporterApiService
-import com.mountplanner.domain.model.ResumeTripRequest
+import com.mountplanner.data.remote.ResumeRequest
+import com.mountplanner.data.repository.ExpeditionRepository
 import com.mountplanner.worker.LocationWorker
-import com.mountplanner.util.HaversineCalculator
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
@@ -22,9 +22,9 @@ class FinishExpeditionUseCase @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     suspend operator fun invoke(expeditionId: String) {
-        val expedition = expeditionRepository.getById(expeditionId) ?: return
+        val expedition = expeditionRepository.getById(expeditionId).first() ?: return
         
-        val logs = locationLogDao.getByExpeditionId(expeditionId)
+        val logs = locationLogDao.getAllForExpedition(expeditionId)
         var totalDistanceKm = 0.0
         var elevationGainM = 0.0
         var elevationLossM = 0.0
@@ -33,11 +33,13 @@ class FinishExpeditionUseCase @Inject constructor(
             val prev = logs[i - 1]
             val curr = logs[i]
             
-            totalDistanceKm += HaversineCalculator.calculateDistanceKm(
+            totalDistanceKm += HaversineCalculator.distanceKm(
                 prev.lat, prev.lng, curr.lat, curr.lng
             )
             
-            val diff = curr.altitude - prev.altitude
+            val prevAlt = prev.altitudeM ?: 0.0
+            val currAlt = curr.altitudeM ?: 0.0
+            val diff = currAlt - prevAlt
             if (diff > 0) {
                 elevationGainM += diff
             } else {
@@ -57,14 +59,14 @@ class FinishExpeditionUseCase @Inject constructor(
         expeditionRepository.save(updated)
         
         LocationWorker.cancelLocationWorker(context)
-        appPreferences.clearActiveExpeditionData()
+        appPreferences.setActiveExpeditionId(null)
         
         val mountReporterEnabled = appPreferences.mountReporterEnabled.first()
         val tripId = appPreferences.mountReporterTripId.first()
         
-        if (mountReporterEnabled && tripId != null) {
+        if (mountReporterEnabled && !tripId.isNullOrEmpty()) {
             try {
-                apiService.resumeTrip(ResumeTripRequest(tripId = tripId))
+                apiService.resumeRoute(ResumeRequest(tripId = tripId))
             } catch (e: Exception) {
                 // Ignore
             }

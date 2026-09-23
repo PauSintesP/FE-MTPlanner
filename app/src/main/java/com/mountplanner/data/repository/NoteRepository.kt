@@ -22,6 +22,9 @@ class NoteRepository @Inject constructor(
     fun getByExpeditionAndDay(expeditionId: String, dayNumber: Int): Flow<List<Note>> =
         noteDao.getByExpeditionAndDay(expeditionId, dayNumber).map { list -> list.map { it.toDomain() } }
 
+    fun getLastNote(): Flow<Note?> =
+        noteDao.getAllNotes().map { list -> list.firstOrNull()?.toDomain() }
+
     suspend fun getById(id: String): Note? =
         noteDao.getById(id)?.toDomain()
 

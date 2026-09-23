@@ -1,8 +1,9 @@
 package com.mountplanner.domain.usecase
 
-import com.mountplanner.domain.model.Poi
-import com.mountplanner.domain.repository.PoiRepository
-import com.mountplanner.util.HaversineCalculator
+import com.mountplanner.core.HaversineCalculator
+import com.mountplanner.data.model.Poi
+import com.mountplanner.data.repository.PoiRepository
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -17,9 +18,9 @@ class GetNearbyPoisUseCase @Inject constructor(
         category: String? = null
     ): List<Poi> {
         val pois = if (category != null) {
-            poiRepository.getByCategory(category)
+            poiRepository.getByCategory(category).first()
         } else {
-            poiRepository.getAll()
+            poiRepository.getAllPois().first()
         }
         
         return HaversineCalculator.sortByDistance(currentLat, currentLng, pois)
