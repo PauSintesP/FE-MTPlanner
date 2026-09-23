@@ -21,10 +21,14 @@ data class Note(
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),
     val syncStatus: String = "local"
-)
+) {
+    val moodEmoji: String get() = mood ?: "📝"
+    val weatherEmoji: String get() = weather ?: "☀️"
+    val timestamp: Long get() = createdAt
+}
 
-val Note.moodEmoji: String? get() = mood
-val Note.weatherEmoji: String? get() = weather
+val Note.moodEmoji: String get() = mood ?: "📝"
+val Note.weatherEmoji: String get() = weather ?: "☀️"
 val Note.timestamp: Long get() = createdAt
 
 fun Note.toEntity(): NoteEntity = NoteEntity(

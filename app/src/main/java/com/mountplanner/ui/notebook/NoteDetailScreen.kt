@@ -9,7 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.mountplanner.domain.model.Note
+import com.mountplanner.domain.model.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,7 +51,7 @@ fun NoteDetailScreen(
             
             Text(note.content, style = MaterialTheme.typography.bodyLarge)
             
-            Divider()
+            HorizontalDivider()
             
             Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
                 Text("Coordenadas: Lat ${note.lat}, Lng ${note.lng}")

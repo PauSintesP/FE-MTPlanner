@@ -3,6 +3,7 @@ package com.mountplanner.core.export
 import android.util.Xml
 import com.mountplanner.data.model.LocationPoint
 import com.mountplanner.data.model.Poi
+import com.mountplanner.data.model.PoiCategory
 import org.xmlpull.v1.XmlPullParser
 import java.io.InputStream
 import java.text.SimpleDateFormat
@@ -107,7 +108,8 @@ class GpxParser {
                                         description = currentPoiDesc,
                                         lat = currentLat,
                                         lng = currentLon,
-                                        altitudeM = currentEle
+                                        altitudeM = currentEle,
+                                        category = PoiCategory.OTHER
                                     )
                                 )
                                 inWpt = false

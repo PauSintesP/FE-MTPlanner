@@ -36,7 +36,7 @@ data class Poi(
     val lat: Double,
     val lng: Double,
     val altitudeM: Double? = null,
-    val category: PoiCategory,
+    val category: PoiCategory = PoiCategory.OTHER,
     val subcategory: String? = null,
     val reliability: String = "uncertain",
     val seasonalAvailability: String? = null,
