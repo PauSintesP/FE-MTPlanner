@@ -1,0 +1,17 @@
+[
+  {"category": "Navegación", "name": "Mapa topográfico", "weightGrams": 80, "isOptional": false},
+  {"category": "Navegación", "name": "Smartphone con batería 100%", "weightGrams": 200, "isOptional": false},
+  {"category": "Agua", "name": "Agua (mínimo 1.5L)", "weightGrams": 1500, "isOptional": false},
+  {"category": "Comida", "name": "Almuerzo y snacks", "weightGrams": 500, "isOptional": false},
+  {"category": "Ropa", "name": "Chubasquero o capa de agua", "weightGrams": 300, "isOptional": false},
+  {"category": "Ropa", "name": "Capa de abrigo (polar)", "weightGrams": 300, "isOptional": false},
+  {"category": "Seguridad", "name": "Botiquín básico", "weightGrams": 200, "isOptional": false},
+  {"category": "Seguridad", "name": "Manta térmica", "weightGrams": 50, "isOptional": false},
+  {"category": "Seguridad", "name": "Silbato", "weightGrams": 15, "isOptional": false},
+  {"category": "Técnico", "name": "Linterna frontal", "weightGrams": 120, "isOptional": false},
+  {"category": "Técnico", "name": "Mochila de día (20-30L)", "weightGrams": 800, "isOptional": false},
+  {"category": "Protección", "name": "Gafas de sol", "weightGrams": 50, "isOptional": false},
+  {"category": "Protección", "name": "Crema solar", "weightGrams": 80, "isOptional": false},
+  {"category": "Varios", "name": "Bolsa para basura", "weightGrams": 20, "isOptional": false},
+  {"category": "Varios", "name": "Identificación y efectivo", "weightGrams": 50, "isOptional": false}
+]
