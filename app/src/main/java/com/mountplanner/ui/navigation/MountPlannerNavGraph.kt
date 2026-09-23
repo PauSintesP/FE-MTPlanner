@@ -17,13 +17,27 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.mountplanner.ui.checklist.ChecklistScreen
+import com.mountplanner.ui.expedition.active.ActiveExpeditionScreen
+import com.mountplanner.ui.expedition.create.CreateExpeditionScreen
+import com.mountplanner.ui.expedition.detail.ExpeditionDetailScreen
+import com.mountplanner.ui.expedition.list.ExpeditionListScreen
+import com.mountplanner.ui.home.HomeScreen
+import com.mountplanner.ui.map.OfflineMapScreen
+import com.mountplanner.ui.map.PlanningMapScreen
+import com.mountplanner.ui.notebook.AddNoteScreen
+import com.mountplanner.ui.notebook.NotebookScreen
+import com.mountplanner.ui.poi.AddPoiScreen
+import com.mountplanner.ui.poi.PoiListScreen
+import com.mountplanner.ui.settings.SettingsScreen
+import com.mountplanner.ui.sharing.ShareLocationScreen
+import com.mountplanner.ui.weather.WeatherScreen
 
 @Composable
 fun MountPlannerNavGraph() {
@@ -80,56 +94,77 @@ fun MountPlannerNavGraph() {
             exitTransition = { fadeOut() }
         ) {
             composable(Screen.Home.route) {
-                // HomeViewModel here
-                Text("Home Screen")
+                HomeScreen(
+                    onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
+                    onNavigateToCreateExpedition = { navController.navigate(Screen.CreateExpedition.route) },
+                    onNavigateToActiveExpedition = { navController.navigate(Screen.ActiveExpedition.route) }
+                )
             }
             composable(Screen.Expeditions.route) {
-                Text("Expeditions Screen")
+                ExpeditionListScreen(
+                    onNavigateToCreate = { navController.navigate(Screen.CreateExpedition.route) },
+                    onNavigateToDetail = { id -> navController.navigate(Screen.ExpeditionDetail.createRoute(id)) }
+                )
             }
             composable(Screen.Map.route) {
-                Text("Map Screen")
+                PlanningMapScreen()
             }
             composable(Screen.Notebook.route) {
-                Text("Notebook Screen")
+                NotebookScreen(
+                    onAddNoteClick = { navController.navigate(Screen.AddNote.createRoute()) },
+                    onNoteClick = { /* Note click */ }
+                )
             }
             composable(Screen.Pois.route) {
-                Text("Pois Screen")
+                PoiListScreen(
+                    onAddPoiClick = { navController.navigate(Screen.AddPoi.createRoute()) },
+                    onPoiClick = { /* POI click */ }
+                )
             }
             composable(Screen.CreateExpedition.route) {
-                Text("CreateExpedition")
+                CreateExpeditionScreen(
+                    onNavigateBack = { navController.popBackStack() }
+                )
             }
-            composable(Screen.ExpeditionDetail.route) {
-                Text("ExpeditionDetail")
+            composable(Screen.ExpeditionDetail.route) { backStackEntry ->
+                val id = backStackEntry.arguments?.getString("expeditionId") ?: ""
+                ExpeditionDetailScreen(
+                    expeditionId = id,
+                    onNavigateBack = { navController.popBackStack() }
+                )
             }
             composable(Screen.ActiveExpedition.route) {
-                Text("ActiveExpedition")
-            }
-            composable(Screen.PoiDetail.route) {
-                Text("PoiDetail")
+                ActiveExpeditionScreen(
+                    onNavigateBack = { navController.popBackStack() }
+                )
             }
             composable(Screen.AddPoi.route) {
-                Text("AddPoi")
-            }
-            composable(Screen.NoteDetail.route) {
-                Text("NoteDetail")
+                AddPoiScreen(
+                    onBackClick = { navController.popBackStack() },
+                    onSaveSuccess = { navController.popBackStack() }
+                )
             }
             composable(Screen.AddNote.route) {
-                Text("AddNote")
+                AddNoteScreen(
+                    onBackClick = { navController.popBackStack() }
+                )
             }
             composable(Screen.Weather.route) {
-                Text("Weather")
+                WeatherScreen()
             }
             composable(Screen.Checklist.route) {
-                Text("Checklist")
+                ChecklistScreen()
             }
             composable(Screen.ShareLocation.route) {
-                Text("ShareLocation")
+                ShareLocationScreen()
             }
             composable(Screen.OfflineMap.route) {
-                Text("OfflineMap")
+                OfflineMapScreen()
             }
             composable(Screen.Settings.route) {
-                Text("Settings")
+                SettingsScreen(
+                    onNavigateBack = { navController.popBackStack() }
+                )
             }
         }
     }

@@ -7,10 +7,11 @@ import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
-import com.mountplanner.data.local.preferences.AppPreferences
+import com.mountplanner.core.prefs.AppPreferences
 import com.mountplanner.data.local.dao.LocationLogDao
 import com.mountplanner.data.remote.MountReporterApiService
-import com.mountplanner.domain.model.PingRequest
+import com.mountplanner.data.remote.PingRequest
+import java.time.Instant
 
 @HiltWorker
 class SyncWorker @AssistedInject constructor(
@@ -22,11 +23,11 @@ class SyncWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
-        try {
-            val pendingPings = locationLogDao.getPendingPings()
+        return try {
+            val pendingPings = locationLogDao.getPendingSync()
             val tripId = appPreferences.mountReporterTripId.first()
-            
-            if (tripId == null || pendingPings.isEmpty()) {
+
+            if (tripId.isNullOrEmpty() || pendingPings.isEmpty()) {
                 return Result.success()
             }
 
@@ -36,21 +37,22 @@ class SyncWorker @AssistedInject constructor(
                         tripId = tripId,
                         lat = ping.lat,
                         lng = ping.lng,
-                        alt = ping.altitude,
-                        battery = ping.batteryLevel
+                        accuracyM = ping.accuracyM,
+                        batteryPct = ping.batteryPct,
+                        clientTs = Instant.ofEpochMilli(ping.capturedAt).toString()
                     )
                     val response = apiService.sendPing(request)
                     if (response.isSuccessful) {
-                        val backendPingId = response.body()?.id ?: ""
+                        val backendPingId = response.body()?.pingId?.toString() ?: ""
                         locationLogDao.markAsSentToBackend(ping.id, backendPingId)
                     }
                 } catch (e: Exception) {
-                    // Si falla, lo deja como pendiente para el próximo intento
+                    // Si falla este ping, continúa con los demás y se reintentará en el próximo ciclo
                 }
             }
-            return Result.success()
+            Result.success()
         } catch (e: Exception) {
-            return Result.success()
+            Result.success()
         }
     }
 }

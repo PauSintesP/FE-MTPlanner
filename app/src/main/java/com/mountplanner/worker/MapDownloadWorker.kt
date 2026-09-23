@@ -7,7 +7,7 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import com.mountplanner.util.MapTileDownloader
+import com.mountplanner.core.map.MapTileDownloader
 
 @HiltWorker
 class MapDownloadWorker @AssistedInject constructor(
