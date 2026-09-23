@@ -52,8 +52,8 @@ fun WeatherScreen(
                             Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)) {
                                 Column(modifier = Modifier.padding(16.dp)) {
                                     Text(weatherCodeToEmoji(today.weatherCode), style = MaterialTheme.typography.displayLarge)
-                                    Text("Máx: ${today.maxTemp}° Mín: ${today.minTemp}°")
-                                    Text("Precip: ${today.precipitation} mm")
+                                    Text("Máx: ${today.maxTempC.toInt()}° Mín: ${today.minTempC.toInt()}°")
+                                    Text("Precip: ${today.precipitationMm} mm")
                                 }
                             }
                         }
@@ -67,7 +67,7 @@ fun WeatherScreen(
                                 ) {
                                     Text(day.date)
                                     Text(weatherCodeToEmoji(day.weatherCode))
-                                    Text("${day.maxTemp}° / ${day.minTemp}°")
+                                    Text("${day.maxTempC.toInt()}° / ${day.minTempC.toInt()}°")
                                 }
                             }
                         }

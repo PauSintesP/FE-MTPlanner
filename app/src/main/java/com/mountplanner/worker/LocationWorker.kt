@@ -143,7 +143,7 @@ class LocationWorker @AssistedInject constructor(
                     )
                     val response = apiService.sendPing(pingRequest)
                     if (response.isSuccessful) {
-                        val backendPingId = response.body()?.pingId?.toString()
+                        val backendPingId = response.body()?.pingId?.toString() ?: ""
                         locationLogDao.markAsSentToBackend(logId, backendPingId)
                     } else {
                         enqueueSyncWorker()
